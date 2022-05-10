@@ -19,16 +19,14 @@
 
 #include <QtCore>
 
-struct Chunk
-{
+struct Chunk {
     QByteArray data;
     QByteArray dataChanged;
     qint64 absPos;
 };
 
-class Chunks: public QObject
-{
-Q_OBJECT
+class Chunks : public QObject {
+    Q_OBJECT
 public:
     // Constructors and file settings
     Chunks(QObject *parent);
@@ -36,8 +34,8 @@ public:
     bool setIODevice(QIODevice &ioDevice);
 
     // Getting data out of Chunks
-    QByteArray data(qint64 pos=0, qint64 count=-1, QByteArray *highlighted=0);
-    bool write(QIODevice &iODevice, qint64 pos=0, qint64 count=-1);
+    QByteArray data(qint64 pos = 0, qint64 count = -1, QByteArray *highlighted = 0);
+    bool write(QIODevice &iODevice, qint64 pos = 0, qint64 count = -1);
 
     // Set and get highlighting infos
     void setDataChanged(qint64 pos, bool dataChanged);
@@ -57,11 +55,10 @@ public:
     qint64 pos();
     qint64 size();
 
-
 private:
     int getChunkIndex(qint64 absPos);
 
-    QIODevice * _ioDevice;
+    QIODevice *_ioDevice;
     qint64 _pos;
     qint64 _size;
     QList<Chunk> _chunks;

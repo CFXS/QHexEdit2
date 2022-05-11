@@ -985,7 +985,7 @@ void QHexEdit::adjust() {
     _rowsShown    = ((viewport()->height() - 4) / _pxCharHeight);
     int lineCount = (int)(_chunks->size() / (qint64)_bytesPerLine) + 1;
     verticalScrollBar()->setRange(0, lineCount - _rowsShown);
-    verticalScrollBar()->setPageStep(_rowsShown);
+    verticalScrollBar()->setPageStep(lineCount / 16);
 
     int value  = verticalScrollBar()->value();
     _bPosFirst = (qint64)value * _bytesPerLine;

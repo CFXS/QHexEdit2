@@ -774,26 +774,17 @@ void QHexEdit::paintEvent(QPaintEvent *event) {
             painter.fillRect(QRect(-pxOfsX, event->rect().top(), _pxPosHexX - _pxGapAdrHex / 2, height()), _addressAreaColor);
         if (_asciiArea) {
             int linePos = _pxPosAsciiX - (_pxGapHexAscii / 2);
-            painter.setPen(Qt::gray);
+            painter.setPen(QColor{0, 105, 220, 64});
             painter.drawLine(linePos - pxOfsX, event->rect().top(), linePos - pxOfsX, height());
-        }
-
-        painter.setPen(viewport()->palette().color(QPalette::WindowText));
-
-        // paint address area
-        if (_addressArea) {
-            QString address;
-            for (int row = 0, pxPosY = _pxCharHeight; row <= (_dataShown.size() / _bytesPerLine); row++, pxPosY += _pxCharHeight) {
-                address = QString("%1").arg(_bPosFirst + row * _bytesPerLine + _addressOffset, _addrDigits, 16, QChar('0'));
-                painter.setPen(QPen(_addressFontColor));
-                painter.drawText(_pxPosAdrX - pxOfsX, pxPosY, hexCaps() ? address.toUpper() : address);
-            }
         }
 
         // paint hex and ascii area
         QPen colStandard = QPen(viewport()->palette().color(QPalette::WindowText));
 
         painter.setBackgroundMode(Qt::TransparentMode);
+
+        int rowSelMax = -1;
+        int rowSelMin = _rowsShown + 1;
 
         for (int row = 0, pxPosY = pxPosStartY; row <= _rowsShown; row++, pxPosY += _pxCharHeight) {
             QByteArray hex;
@@ -808,6 +799,10 @@ void QHexEdit::paintEvent(QPaintEvent *event) {
                 if ((getSelectionBegin() <= posBa) && (getSelectionEnd() > posBa)) {
                     c = _brushSelection.color();
                     painter.setPen(_penSelection);
+                    if (row > rowSelMax)
+                        rowSelMax = row;
+                    if (row < rowSelMin)
+                        rowSelMin = row;
                 } else {
                     if (_highlighting)
                         if (_markedShown.at((int)(posBa - _bPosFirst))) {
@@ -842,6 +837,42 @@ void QHexEdit::paintEvent(QPaintEvent *event) {
                 }
             }
         }
+
+        painter.setPen(viewport()->palette().color(QPalette::WindowText));
+
+        // paint address area
+        if (_addressArea) {
+            QString address;
+            for (int row = 0, pxPosY = _pxCharHeight; row <= (_dataShown.size() / _bytesPerLine); row++, pxPosY += _pxCharHeight) {
+                address = QString("%1").arg(_bPosFirst + row * _bytesPerLine + _addressOffset, _addrDigits, 16, QChar('0'));
+
+                bool selRange;
+                if (rowSelMin <= rowSelMax) {
+                    selRange = row >= rowSelMin && row <= rowSelMax;
+                } else {
+                    if (_readOnly) {
+                        selRange = _pxCursorY == pxPosY;
+                    } else {
+                        selRange = _cursorRect.y() == pxPosY;
+                    }
+                }
+
+                if (selRange) {
+                    QRect r;
+                    r.setRect(_pxPosAdrX - pxOfsX - _pxGapAdr,
+                              pxPosY - _pxCharHeight + _pxSelectionSub,
+                              address.length() * _pxCharWidth + _pxGapAdr * 2,
+                              _pxCharHeight);
+                    painter.fillRect(r, QColor{255, 255, 255, 48});
+                    painter.setPen(QPen(QColor{180, 180, 180}));
+                } else {
+                    painter.setPen(QPen(_addressFontColor));
+                }
+
+                painter.drawText(_pxPosAdrX - pxOfsX, pxPosY, hexCaps() ? address.toUpper() : address);
+            }
+        }
+
         painter.setBackgroundMode(Qt::TransparentMode);
         painter.setPen(viewport()->palette().color(QPalette::WindowText));
     }
@@ -853,11 +884,12 @@ void QHexEdit::paintEvent(QPaintEvent *event) {
     if ((hexPositionInShowData >= 0) && (hexPositionInShowData < _hexDataShown.size())) {
         // paint cursor
         if (_readOnly) {
-            QColor color = viewport()->palette().dark().color();
+            QColor color = QColor(255, 255, 255, 64);
             painter.fillRect(QRect(_pxCursorX - pxOfsX, _pxCursorY - _pxCharHeight + _pxSelectionSub, _pxCharWidth, _pxCharHeight), color);
         } else {
             if (_blink && hasFocus())
-                painter.fillRect(_cursorRect, this->palette().color(QPalette::WindowText));
+                painter.fillRect(_cursorRect, QColor(255, 255, 255, 64));
+            //painter.fillRect(_cursorRect, this->palette().color(QPalette::WindowText));
         }
         if (_editAreaIsAscii) {
             // every 2 hex there is 1 ascii

@@ -366,6 +366,20 @@ public:
     QColor selectionColor();
     void setSelectionColor(const QColor &color);
 
+    qint64 GetSelectionStart() const {
+        return getSelectionBegin();
+    }
+
+    qint64 GetSelectionEnd() const {
+        return getSelectionEnd();
+    }
+
+    qint64 GetSelectionSize() const {
+        return getSelectionEnd() - getSelectionBegin();
+    }
+
+    QByteArray GetChunkData(quint64 addr, quint64 size);
+
 protected:
     // Handle events
     void keyPressEvent(QKeyEvent *event);
@@ -380,8 +394,8 @@ private:
     void resetSelection(qint64 pos); // set selectionStart and selectionEnd to pos
     void resetSelection();           // set selectionEnd to selectionStart
     void setSelection(qint64 pos);   // set min (if below init) or max (if greater init)
-    qint64 getSelectionBegin();
-    qint64 getSelectionEnd();
+    qint64 getSelectionBegin() const;
+    qint64 getSelectionEnd() const;
 
     // Private utility functions
     void init();

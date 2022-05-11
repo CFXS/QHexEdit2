@@ -255,6 +255,10 @@ QByteArray QHexEdit::data() {
     return _chunks->data(0, -1);
 }
 
+QByteArray QHexEdit::GetChunkData(quint64 addr, quint64 size) {
+    return _chunks->data(addr, size);
+}
+
 void QHexEdit::setHighlighting(bool highlighting) {
     _highlighting = highlighting;
     viewport()->update();
@@ -976,13 +980,15 @@ void QHexEdit::setSelection(qint64 pos) {
         _bSelectionBegin = pos;
         _bSelectionEnd   = _bSelectionInit;
     }
+
+    emit currentAddressChanged(pos);
 }
 
-qint64 QHexEdit::getSelectionBegin() {
+qint64 QHexEdit::getSelectionBegin() const {
     return _bSelectionBegin;
 }
 
-qint64 QHexEdit::getSelectionEnd() {
+qint64 QHexEdit::getSelectionEnd() const {
     return _bSelectionEnd;
 }
 
@@ -1017,7 +1023,7 @@ void QHexEdit::adjust() {
     _rowsShown    = ((viewport()->height() - 4) / _pxCharHeight);
     int lineCount = (int)(_chunks->size() / (qint64)_bytesPerLine) + 1;
     verticalScrollBar()->setRange(0, lineCount - _rowsShown);
-    verticalScrollBar()->setPageStep(lineCount / 16);
+    verticalScrollBar()->setPageStep(lineCount / 12);
 
     int value  = verticalScrollBar()->value();
     _bPosFirst = (qint64)value * _bytesPerLine;

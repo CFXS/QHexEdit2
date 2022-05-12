@@ -778,7 +778,7 @@ void QHexEdit::paintEvent(QPaintEvent *event) {
             painter.fillRect(QRect(-pxOfsX, event->rect().top(), _pxPosHexX - _pxGapAdrHex / 2, height()), _addressAreaColor);
         if (_asciiArea) {
             int linePos = _pxPosAsciiX - (_pxGapHexAscii / 2);
-            painter.setPen(QColor{0, 105, 220, 64});
+            painter.setPen(QColor{0, 105, 220, 128});
             painter.drawLine(linePos - pxOfsX, event->rect().top(), linePos - pxOfsX, height());
         }
 
@@ -818,12 +818,12 @@ void QHexEdit::paintEvent(QPaintEvent *event) {
                 // render hex value
                 QRect r;
                 if (colIdx == 0)
-                    r.setRect(pxPosX, pxPosY - _pxCharHeight + _pxSelectionSub, 2 * _pxCharWidth, _pxCharHeight);
+                    r.setRect(pxPosX - 1, pxPosY - _pxCharHeight + _pxSelectionSub, 2 * _pxCharWidth + 1, _pxCharHeight);
                 else
                     r.setRect(pxPosX - _pxCharWidth, pxPosY - _pxCharHeight + _pxSelectionSub, 3 * _pxCharWidth, _pxCharHeight);
                 painter.fillRect(r, c);
                 hex = _hexDataShown.mid((bPosLine + colIdx) * 2, 2);
-                painter.drawText(pxPosX, pxPosY, hexCaps() ? hex.toUpper() : hex);
+                painter.drawText(pxPosX, pxPosY - 2, hexCaps() ? hex.toUpper() : hex);
                 pxPosX += 3 * _pxCharWidth;
 
                 // render ascii value
@@ -833,10 +833,13 @@ void QHexEdit::paintEvent(QPaintEvent *event) {
                     int ch = (uchar)_dataShown.at(bPosLine + colIdx);
                     if (ch < ' ' || ch > '~')
                         ch = '.';
-                    r.setRect(pxPosAsciiX2, pxPosY - _pxCharHeight + _pxSelectionSub, _pxCharWidth, _pxCharHeight);
+                    if (colIdx == 0)
+                        r.setRect(pxPosAsciiX2 - 1, pxPosY - _pxCharHeight + _pxSelectionSub, _pxCharWidth + 1, _pxCharHeight);
+                    else
+                        r.setRect(pxPosAsciiX2, pxPosY - _pxCharHeight + _pxSelectionSub, _pxCharWidth, _pxCharHeight);
                     painter.fillRect(r, c);
                     painter.setPen(QPen(_asciiFontColor));
-                    painter.drawText(pxPosAsciiX2, pxPosY, QChar(ch));
+                    painter.drawText(pxPosAsciiX2, pxPosY - 2, QChar(ch));
                     pxPosAsciiX2 += _pxCharWidth;
                 }
             }
@@ -873,7 +876,7 @@ void QHexEdit::paintEvent(QPaintEvent *event) {
                     painter.setPen(QPen(_addressFontColor));
                 }
 
-                painter.drawText(_pxPosAdrX - pxOfsX, pxPosY, hexCaps() ? address.toUpper() : address);
+                painter.drawText(_pxPosAdrX - pxOfsX, pxPosY - 2, hexCaps() ? address.toUpper() : address);
             }
         }
 
@@ -902,11 +905,11 @@ void QHexEdit::paintEvent(QPaintEvent *event) {
             if (ch < ' ' || ch > '~')
                 ch = '.';
 
-            painter.drawText(_pxCursorX - pxOfsX, _pxCursorY, QChar(ch));
+            painter.drawText(_pxCursorX - pxOfsX, _pxCursorY - 2, QChar(ch));
         } else {
             painter.drawText(
                 _pxCursorX - pxOfsX,
-                _pxCursorY,
+                _pxCursorY - 2,
                 hexCaps() ? _hexDataShown.mid(hexPositionInShowData, 1).toUpper() : _hexDataShown.mid(hexPositionInShowData, 1));
         }
     }

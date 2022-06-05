@@ -745,6 +745,9 @@ void QHexEdit::keyPressEvent(QKeyEvent *event) {
 }
 
 void QHexEdit::mouseMoveEvent(QMouseEvent *event) {
+    if (event->buttons() & Qt::RightButton) // do not allow rightclick select
+        return;
+
     _blink = false;
     viewport()->update();
     qint64 actPos = cursorPosition(event->pos());
@@ -755,6 +758,9 @@ void QHexEdit::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void QHexEdit::mousePressEvent(QMouseEvent *event) {
+    if (event->buttons() & Qt::RightButton) // do not allow rightclick cursor set
+        return;
+
     _blink = false;
     viewport()->update();
     qint64 cPos = cursorPosition(event->pos());
@@ -865,12 +871,15 @@ void QHexEdit::paintEvent(QPaintEvent *event) {
                 }
 
                 if (selRange) {
+                    static constexpr auto SEP_W = 2;
                     QRect r;
-                    r.setRect(_pxPosAdrX - pxOfsX - _pxGapAdr,
-                              pxPosY - _pxCharHeight + _pxSelectionSub,
-                              address.length() * _pxCharWidth + _pxGapAdr * 2,
-                              _pxCharHeight);
+                    auto baseW = address.length() * _pxCharWidth + _pxGapAdr * 2 - SEP_W;
+                    r.setRect(_pxPosAdrX - pxOfsX - _pxGapAdr, pxPosY - _pxCharHeight + _pxSelectionSub, baseW, _pxCharHeight);
                     painter.fillRect(r, QColor{255, 255, 255, 48});
+
+                    r.setRect(_pxPosAdrX - pxOfsX - _pxGapAdr + baseW, pxPosY - _pxCharHeight + _pxSelectionSub, SEP_W, _pxCharHeight);
+                    painter.fillRect(r, QColor{0, 105, 220, 255});
+
                     painter.setPen(QPen(QColor{180, 180, 180}));
                 } else {
                     painter.setPen(QPen(_addressFontColor));
@@ -891,11 +900,11 @@ void QHexEdit::paintEvent(QPaintEvent *event) {
     if ((hexPositionInShowData >= 0) && (hexPositionInShowData < _hexDataShown.size())) {
         // paint cursor
         if (_readOnly) {
-            QColor color = QColor(255, 255, 255, 64);
+            QColor color = QColor(255, 0, 255, 128);
             painter.fillRect(QRect(_pxCursorX - pxOfsX, _pxCursorY - _pxCharHeight + _pxSelectionSub, _pxCharWidth, _pxCharHeight), color);
         } else {
             if (_blink && hasFocus())
-                painter.fillRect(_cursorRect, QColor(255, 255, 255, 64));
+                painter.fillRect(_cursorRect, QColor(255, 0, 255, 128));
             //painter.fillRect(_cursorRect, this->palette().color(QPalette::WindowText));
         }
         if (_editAreaIsAscii) {

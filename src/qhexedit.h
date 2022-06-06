@@ -366,11 +366,6 @@ public:
     QColor selectionColor();
     void setSelectionColor(const QColor &color);
 
-    void SetSelection(qint64 a, qint64 b) {
-        resetSelection(a * 2);
-        setSelection(b * 2);
-    }
-
     qint64 GetSelectionStart() const {
         return getSelectionBegin();
     }
@@ -381,6 +376,10 @@ public:
 
     qint64 GetSelectionSize() const {
         return getSelectionEnd() - getSelectionBegin();
+    }
+    void SetSelection(qint64 a, qint64 b) {
+        resetSelection(a * 2);
+        setSelection(b * 2);
     }
 
     QByteArray GetChunkData(quint64 addr, quint64 size);

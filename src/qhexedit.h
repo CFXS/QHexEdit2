@@ -377,6 +377,10 @@ public:
     qint64 GetSelectionSize() const {
         return getSelectionEnd() - getSelectionBegin();
     }
+    void SetSelection(qint64 a, qint64 b) {
+        resetSelection(a * 2);
+        setSelection(b * 2);
+    }
 
     QByteArray GetChunkData(quint64 addr, quint64 size);
 
